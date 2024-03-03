@@ -1,0 +1,53 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Wake on Lan</h1>
+
+    @foreach (var server in Model.WakeOnLanServers)
+    {
+        <h2>@server.Label</h2>
+        <h3>@server.MAC</h3>
+
+        <div>
+            <h3>@server.IP</h3>
+            <span>Server is </span>
+            <span style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</span>
+            @if (!server.IsServerUp)
+            {
+                <form style="display: inline" asp-route-mac="@server.MAC" method="post">
+                    <button>Start</button>
+                </form>
+            }            
+        </div>
+
+        if (@server.IsServerUp)
+        {
+            <div>
+                @* <h3>@server.Api</h3> *@
+                <span>API is </span>
+                <span style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</span>
+            </div>        
+
+            @foreach (var service in server.Services)
+            {
+                <div>
+                    @* <h4>@service.Api</h4> *@
+                    <span>Service '@service.Label' is </span>
+                    <span style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</span>
+                    @if (server.IsApiUp && !service.IsUp)
+                    {
+                        <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-serviceLabel="@service.Label" method="post">
+                            <button>Start</button>
+                        </form>
+                    }
+                </div>  
+            }
+        }
+
+        <hr/>
+    }
+</div>
