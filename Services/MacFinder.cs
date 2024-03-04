@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Net.NetworkInformation;
 
 public class NetworkFinder
@@ -10,24 +11,22 @@ public class NetworkFinder
         // Console.WriteLine("InitializeGetIPsAndMac");
 
         var arpStream = ExecuteCommandLine("arp", "-a");
-        List<string> result = new List<string>();
+        List<IPAndMac> map = new List<IPAndMac>();
         while (!arpStream.EndOfStream)
         {
             var line = arpStream.ReadLine().Trim();
             // Console.WriteLine(line);
-            result.Add(line);
+
+            var parts = line.ToUpper().Replace("-", ":").Split(' ').Select(p => p.Trim()).Select(p => p.Trim(new[] {'(', ')'})).ToArray();
+
+            var ip = parts.FirstOrDefault(p => IPAddress.TryParse(p, out IPAddress _));
+            var mac = parts.FirstOrDefault(p => p.Length == 17 && p.Count(c => c == ':') == 5);
+
+            if (ip != null && mac != null)
+            {
+                map.Add(new IPAndMac { IP = ip, MAC = mac });
+            }
         }
-
-        // Console.WriteLine("=========");
-
-        var map = result
-            .Where(l => l.Length > 0 && int.TryParse(l[0].ToString(), out int _)) // skip headers
-            .Select(x =>
-                {
-                    string[] parts = x.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                    return new IPAndMac { IP = parts[0].Trim(), MAC = parts[1].Trim().ToUpper().Replace("-", ":") };
-                })
-            .ToList();
 
         var macAddresses = NetworkInterface.GetAllNetworkInterfaces()
             .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
