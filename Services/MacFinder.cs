@@ -34,7 +34,7 @@ public class NetworkFinder
             .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
             .Select(nic => nic.GetPhysicalAddress().ToString())
             .Where(macAddress => !string.IsNullOrEmpty(macAddress))
-            .Where(macAddress => maxAddress != "00:00:00:00:00:00");
+            .Where(macAddress => macAddress != "00:00:00:00:00:00");
 
         foreach (var macAddress in macAddresses)
         {
