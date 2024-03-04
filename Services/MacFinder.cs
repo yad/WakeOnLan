@@ -28,10 +28,13 @@ public class NetworkFinder
             }
         }
 
+        // Console.WriteLine("=========");
+
         var macAddresses = NetworkInterface.GetAllNetworkInterfaces()
             .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
             .Select(nic => nic.GetPhysicalAddress().ToString())
-            .Where(macAddress => !string.IsNullOrEmpty(macAddress));
+            .Where(macAddress => !string.IsNullOrEmpty(macAddress))
+            .Where(macAddress => maxAddress != "00:00:00:00:00:00");
 
         foreach (var macAddress in macAddresses)
         {

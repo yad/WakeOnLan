@@ -44,6 +44,8 @@ dotnet, download https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 `git pull`
 
+`sudo systemctl stop wol.service`
+
 `sudo dotnet publish --runtime linux-arm --self-contained -o /opt/wol`
 
 `sudo chown -R wol:wol /opt/wol/`
