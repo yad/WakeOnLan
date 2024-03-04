@@ -1,0 +1,17 @@
+[Unit]
+Description=WakeOnLan
+After=network.target
+
+[Service]
+Environment="ASPNETCORE_URLS=http://*:5122"
+User=wol
+Group=wol
+Type=simple
+WorkingDirectory=/opt/wol
+ExecStart=dotnet wol.dll
+TimeoutStopSec=20
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
