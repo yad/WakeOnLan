@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -53,9 +54,8 @@ public class IndexModel : PageModel
                     server.IsApiUp = result.StatusCode == System.Net.HttpStatusCode.OK;
                 }
             }
-            catch (Exception ex)
+            catch (TaskCanceledException)
             {
-                Console.WriteLine(ex.ToString());
             }
 
             if (server.IsApiUp)
@@ -71,9 +71,8 @@ public class IndexModel : PageModel
                             service.IsUp = result.StatusCode == System.Net.HttpStatusCode.OK;
                         }
                     }
-                    catch (Exception ex)
+                    catch (TaskCanceledException)
                     {
-                        Console.WriteLine(ex.ToString());
                     }
                 }
             }
@@ -97,18 +96,17 @@ public class IndexModel : PageModel
             }
             else
             {
-                using (var client = new UdpClient("255.255.255.255", 12287) { EnableBroadcast = true })
+                using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp) { EnableBroadcast = true })
                 {
-                    var macPacket = mac.ToLower().Replace(":", "");
-                    Console.WriteLine(macPacket);
-                    await client.SendAsync(Enumerable.Repeat<byte>(255, 6).Concat(Enumerable.Repeat(Enumerable.Range(0, 6).Select(i => Convert.ToByte(macPacket.Substring(i * 2, 2), 16)), 16).SelectMany(b => b)).ToArray(), 102);
-                }
+                    string payloadmac = mac.ToLower().Replace(":", "");
+                    var payload = Enumerable.Repeat<byte>(255, 6).Concat(Enumerable.Repeat(Enumerable.Range(0, 6).Select(i => Convert.ToByte(payloadmac.Substring(i * 2, 2), 16)), 16).SelectMany(b => b)).ToArray();
 
+                    sock.SendTo(payload, new IPEndPoint(IPAddress.Parse("255.255.255.255"), 12345));
+                }
             }
         }
-        catch (Exception ex)
+        catch (TaskCanceledException)
         {
-            Console.WriteLine(ex.ToString());
         }
         return RedirectToPage("/Index");
     }
