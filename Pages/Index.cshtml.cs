@@ -52,8 +52,10 @@ public class IndexModel : PageModel
                     server.IsServerUp = reply.Status == IPStatus.Success;
                 }
             }
-            catch (PingException)
+            catch (PingException ex)
             {
+                server.IsServerUp = true;
+                Console.WriteLine(ex.ToString());
             }
 
             if (!server.IsServerUp)
