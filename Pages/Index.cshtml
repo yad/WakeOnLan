@@ -10,7 +10,7 @@
         <h2>@server.Label</h2>
         <h3>@server.MAC</h3>
 
-        <p>
+        <div>
             <h3>@server.IP</h3>
             <span>Host is </span>
             <span style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</span>
@@ -20,18 +20,18 @@
                     <button class="btn btn-success">Start</button>
                 </form>
             }            
-        </p>
+        </div>
 
         if (@server.IsServerUp && @server.Port != 0)
         {
-            <p>
+            <div>
                 <span>API is </span>
                 <span style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</span>
-            </p>        
+            </div>        
 
             @foreach (var service in server.Services)
             {
-                <p style="display: inline">
+                <div class="paragraph">
                     <span>Service '@service.Label' is </span>
                     <span style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</span>
                     @if (server.IsApiUp && !service.IsUp)
@@ -40,7 +40,7 @@
                             <button class="btn btn-success">Start</button>
                         </form>
                     }
-                </p>  
+                </div>  
             }
         }
 

@@ -32,3 +32,7 @@ body {
 .navbar .container {
   width: auto
 }
+
+.paragraph {
+  margin: 5px;
+}
