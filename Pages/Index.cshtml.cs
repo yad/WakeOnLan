@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,7 +28,7 @@ public class IndexModel : PageModel
             Label = server.Label,
             MAC = server.MAC,
             Port = server.Port,
-            Services = server.Services.Select(service => new Service() 
+            Services = server.Services.Select(service => new Service()
             {
                 Label = service.Label,
                 Process = service.Process,
@@ -37,9 +38,23 @@ public class IndexModel : PageModel
 
         foreach (var server in WakeOnLanServers)
         {
-
             server.IP = _macFinder.FindIPFromMacAddress(server.MAC);
-            server.IsServerUp = server.IP != null; //TODO add ping ICMP
+            if (server.IP == null)
+            {
+                continue;
+            }
+
+            try
+            {
+                using (Ping ping = new Ping())
+                {
+                    var reply = await ping.SendPingAsync(server.IP);
+                    server.IsServerUp = reply.Status == IPStatus.Success;
+                }
+            }
+            catch (PingException)
+            {
+            }
 
             if (!server.IsServerUp)
             {
@@ -49,7 +64,7 @@ public class IndexModel : PageModel
             if (server.Port == 0)
             {
                 continue;
-            }            
+            }
 
             try
             {
