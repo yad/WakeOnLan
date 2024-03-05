@@ -37,6 +37,7 @@ public class IndexModel : PageModel
 
         foreach (var server in WakeOnLanServers)
         {
+
             server.IP = _macFinder.FindIPFromMacAddress(server.MAC);
             server.IsServerUp = server.IP != null; //TODO add ping ICMP
 
@@ -44,6 +45,11 @@ public class IndexModel : PageModel
             {
                 continue;
             }
+
+            if (server.Port == 0)
+            {
+                continue;
+            }            
 
             try
             {

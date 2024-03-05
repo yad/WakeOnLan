@@ -24,3 +24,11 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.btn {
+  vertical-align: inherit;
+}
+
+.navbar .container {
+  width: auto
+}
