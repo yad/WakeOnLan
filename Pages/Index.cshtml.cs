@@ -49,14 +49,12 @@ public class IndexModel : PageModel
                 using (Ping ping = new Ping())
                 {
                     var reply = await ping.SendPingAsync(server.IP);
-                    Console.WriteLine(reply.Status);
                     server.IsServerUp = reply.Status == IPStatus.Success;
                 }
             }
-            catch (PingException ex)
+            catch (PingException)
             {
                 server.IsServerUp = true;
-                Console.WriteLine(ex.ToString());
             }
 
             if (!server.IsServerUp)
