@@ -16,10 +16,16 @@
             <span style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</span>
             @if (!server.IsServerUp)
             {
-                <form style="display: inline" asp-route-mac="@server.MAC" method="post">
+                <form style="display: inline" asp-route-mac="@server.MAC" asp-route-mode="start" method="post">
                     <button class="btn btn-success">Start</button>
                 </form>
-            }            
+            }
+            else if (@server.Port != 0)           
+            {
+                <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="wol" method="post">
+                    <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
+                </form>
+            }
         </div>
 
         if (@server.IsServerUp && @server.Port != 0)
@@ -34,11 +40,21 @@
                 <div class="paragraph">
                     <span>Service '@service.Label' is </span>
                     <span style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</span>
-                    @if (server.IsApiUp && !service.IsUp)
+                    @if (server.IsApiUp)
                     {
-                        <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-serviceLabel="@service.Label" method="post">
-                            <button class="btn btn-success">Start</button>
-                        </form>
+                        if (!service.IsUp)
+                        {
+                            <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="start" asp-route-serviceLabel="@service.Label" method="post">
+                                <button class="btn btn-success">Start</button>
+                            </form>                            
+
+                        }
+                        else
+                        {
+                            <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="@service.Label" method="post">
+                                <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
+                            </form>
+                        }
                     }
                 </div>  
             }

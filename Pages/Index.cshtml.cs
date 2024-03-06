@@ -103,16 +103,16 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string ip, string port, string serviceLabel, string mac)
+    public async Task<IActionResult> OnPostAsync(string ip, string port, string mode, string serviceLabel, string mac)
     {
         try
         {
-            if (string.IsNullOrEmpty(mac))
+            if (string.IsNullOrEmpty(mac) || mode == "stop")
             {
                 using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
                 {
-                    var api = $"http://{ip}:{port}/api/start/{serviceLabel}";
-                    Console.WriteLine(api);
+                    var api = $"http://{ip}:{port}/api/{mode}/{serviceLabel}";
+                    // Console.WriteLine(api);
                     var result = await client.GetAsync(api);
                 }
             }

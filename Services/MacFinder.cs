@@ -8,14 +8,14 @@ public class NetworkFinder
 
     private static IReadOnlyCollection<IPAndMac> InitializeGetIPsAndMac()
     {
-        Console.WriteLine("InitializeGetIPsAndMac");
+        // Console.WriteLine("InitializeGetIPsAndMac");
 
         var arpStream = ExecuteCommandLine("arp", "-a");
         List<IPAndMac> map = new List<IPAndMac>();
         while (!arpStream.EndOfStream)
         {
             var line = arpStream.ReadLine().Trim();
-            Console.WriteLine(line);
+            // Console.WriteLine(line);
 
             var parts = line.ToUpper().Replace("-", ":").Split(' ').Select(p => p.Trim()).Select(p => p.Trim(new[] {'(', ')'})).ToArray();
 
@@ -28,7 +28,7 @@ public class NetworkFinder
             }
         }
 
-        Console.WriteLine("=========");
+        // Console.WriteLine("=========");
 
         var macAddresses = NetworkInterface.GetAllNetworkInterfaces()
             .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
@@ -41,12 +41,12 @@ public class NetworkFinder
             map.Add(new IPAndMac { IP = "127.0.0.1", MAC = string.Join(':', macAddress.Chunk(2).Select(c => new string(c))) });
         };
 
-        foreach (var item in map)
-        {
-            Console.WriteLine($"{item.IP} {item.MAC}");
-        }
+        // foreach (var item in map)
+        // {
+        //     Console.WriteLine($"{item.IP} {item.MAC}");
+        // }
 
-        Console.WriteLine("=========");
+        // Console.WriteLine("=========");
 
         return map.ToArray();
     }
