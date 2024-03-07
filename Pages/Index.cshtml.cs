@@ -32,7 +32,7 @@ public class IndexModel : PageModel
             Services = server.Services.Select(service => new Service()
             {
                 Label = service.Label,
-                Icon = $"/{Path.GetFileNameWithoutExtension(service.Process)}.png",
+                Icon = $"/{service.Process.Split(new[]{'/', '\\', '.'}).Reverse().Skip(1).First()}.png",
                 Process = service.Process,
                 Port = service.Port
             }).ToList()
