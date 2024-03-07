@@ -4,6 +4,11 @@
 builder.Services.AddRazorPages();
 builder.Services.AddTransient<NetworkFinder>();
 builder.Services.Configure<WakeOnLanSettings>(builder.Configuration.GetSection("WakeOnLan")); 
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddConfiguration(builder.Configuration.GetSection("Logging"));
+    loggingBuilder.AddFile(AppContext.BaseDirectory);
+});
 
 var app = builder.Build();
 

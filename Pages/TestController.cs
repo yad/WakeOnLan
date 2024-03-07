@@ -9,10 +9,12 @@ namespace wol.Pages;
 public class TestController : ControllerBase
 {
      public readonly List<WakeOnLan> WakeOnLanServers;
+    private readonly ILogger<TestController> _logger;
     private readonly NetworkFinder _networkFinder;
 
-    public TestController(IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public TestController(ILogger<TestController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
     {
+        _logger = logger;
         WakeOnLanServers = settings.Value;
         _networkFinder = networkFinder;
     }

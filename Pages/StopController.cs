@@ -8,11 +8,13 @@ namespace wol.Pages;
 [Route("api/[controller]")]
 public class StopController : ControllerBase
 {
-     public readonly List<WakeOnLan> WakeOnLanServers;
+    public readonly List<WakeOnLan> WakeOnLanServers;
+    private readonly ILogger<StopController> _logger;
     private readonly NetworkFinder _networkFinder;
 
-    public StopController(IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public StopController(ILogger<StopController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
     {
+        _logger = logger;
         WakeOnLanServers = settings.Value;
         _networkFinder = networkFinder;
     }
@@ -26,8 +28,9 @@ public class StopController : ControllerBase
             {
                 Process.Start("shutdown", "/s /t 30");
             }
-            catch
-            {                
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "shutdown /s /t 30");
             }
             return Content("Minion UP");
         }
@@ -48,22 +51,12 @@ public class StopController : ControllerBase
 
         foreach (var process in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)))
         {
-            if (process.HasExited)
+            if (!process.CloseMainWindow())
             {
-                continue;                
+                process.Kill();
             }
-
-            try
-            {
-                process.CloseMainWindow();
-            }
-            catch(InvalidOperationException)
-            {                
-            }
-
-            process.Close();
-        }
+        }        
 
         return Ok();
-    }    
+    }
 }

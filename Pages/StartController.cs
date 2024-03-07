@@ -9,10 +9,12 @@ namespace wol.Pages;
 public class StartController : ControllerBase
 {
      public readonly List<WakeOnLan> WakeOnLanServers;
+    private readonly ILogger<StartController> _logger;
     private readonly NetworkFinder _networkFinder;
 
-    public StartController(IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public StartController(ILogger<StartController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
     {
+        _logger = logger;
         WakeOnLanServers = settings.Value;
         _networkFinder = networkFinder;
     }
@@ -44,14 +46,14 @@ public class StartController : ControllerBase
             return Content("Process UP");
         }
 
-        ProcessStartInfo startInfo = new ProcessStartInfo();
-        // startInfo.CreateNoWindow = true;
-        startInfo.WindowStyle = ProcessWindowStyle.Minimized;
-        startInfo.UseShellExecute = true;
+        ProcessStartInfo startInfo = new ProcessStartInfo
+        {
+            WindowStyle = ProcessWindowStyle.Minimized,
+            UseShellExecute = true,
 
-        startInfo.WorkingDirectory = Path.GetDirectoryName(service.Process);
-        startInfo.FileName = service.Process;
-        // startInfo.Arguments = "";
+            WorkingDirectory = Path.GetDirectoryName(service.Process),
+            FileName = service.Process
+        };
 
         Process.Start(startInfo);
 

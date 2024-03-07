@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -31,6 +32,7 @@ public class IndexModel : PageModel
             Services = server.Services.Select(service => new Service()
             {
                 Label = service.Label,
+                Icon = $"/{Path.GetFileNameWithoutExtension(service.Process)}.png",
                 Process = service.Process,
                 Port = service.Port
             }).ToList()
@@ -71,7 +73,7 @@ public class IndexModel : PageModel
             {
                 using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
                 {
-                    server.Api = $"http://{server.IP}:{server.Port}/api/test/wol"; // todo add check socket 
+                    server.Api = $"http://{server.IP}:{server.Port}/api/test/wol"; // todo add check socket
                     var result = await client.GetAsync(server.Api);
                     server.IsApiUp = result.StatusCode == System.Net.HttpStatusCode.OK;
                 }
@@ -88,7 +90,7 @@ public class IndexModel : PageModel
                     {
                         using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
                         {
-                            service.Api = $"http://{server.IP}:{server.Port}/api/test/{service.Label}"; // todo add check socket 
+                            service.Api = $"http://{server.IP}:{server.Port}/api/test/{service.Label}"; // todo add check socket
                             var result = await client.GetAsync(service.Api);
                             service.IsUp = result.StatusCode == System.Net.HttpStatusCode.OK;
                         }
@@ -133,4 +135,3 @@ public class IndexModel : PageModel
         return RedirectToPage("/Index");
     }
 }
-

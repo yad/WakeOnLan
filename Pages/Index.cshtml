@@ -20,7 +20,7 @@
                     <button class="btn btn-success">Start</button>
                 </form>
             }
-            else if (@server.Port != 0)           
+            else if (@server.Port != 0)
             {
                 <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="wol" method="post">
                     <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
@@ -33,31 +33,43 @@
             <div class="paragraph">
                 <span>API is </span>
                 <span style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</span>
-            </div>        
+            </div>
 
-            @foreach (var service in server.Services)
-            {
-                <div class="paragraph">
-                    <span>Service '@service.Label' is </span>
-                    <span style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</span>
-                    @if (server.IsApiUp)
+            <table class="table">
+                <tbody class="tbody">
+                    @foreach (var service in server.Services)
                     {
-                        if (!service.IsUp)
-                        {
-                            <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="start" asp-route-serviceLabel="@service.Label" method="post">
-                                <button class="btn btn-success">Start</button>
-                            </form>                            
+                        <tr class="">
+                            <td>
+                                @if (!string.IsNullOrEmpty(service.Icon))
+                                {
+                                    <img src="@service.Icon" alt="@service.Label" />
+                                }
+                            </td>
+                            <td>Service '@service.Label' is </td>
+                            <td style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</td>
+                            <td>
+                            @if (server.IsApiUp)
+                            {
+                                if (!service.IsUp)
+                                {
+                                    <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="start" asp-route-serviceLabel="@service.Label" method="post">
+                                        <button class="btn btn-success">Start</button>
+                                    </form>
 
-                        }
-                        else
-                        {
-                            <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="@service.Label" method="post">
-                                <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
-                            </form>
-                        }
+                                }
+                                else
+                                {
+                                    <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="@service.Label" method="post">
+                                        <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
+                                    </form>
+                                }
+                            }
+                            </td>
+                        </tr>
                     }
-                </div>  
-            }
+                </tbody>
+            </table>
         }
 
         <hr/>
