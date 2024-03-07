@@ -27,6 +27,7 @@ body {
 
 .btn {
   vertical-align: inherit;
+  border: none;
 }
 
 .navbar .container {

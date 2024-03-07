@@ -17,13 +17,13 @@
             @if (!server.IsServerUp)
             {
                 <form style="display: inline" asp-route-mac="@server.MAC" asp-route-mode="start" method="post">
-                    <button class="btn btn-success">Start</button>
+                    <button class="btn btn-success shadow-none">Start</button>
                 </form>
             }
             else if (@server.Port != 0)
             {
                 <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="wol" method="post">
-                    <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
+                    <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@server.Label\' ?')">Stop</button>
                 </form>
             }
         </div>
@@ -39,7 +39,7 @@
                 <tbody class="tbody">
                     @foreach (var service in server.Services)
                     {
-                        <tr class="">
+                        <tr>
                             <td>
                                 @if (!string.IsNullOrEmpty(service.Icon))
                                 {
@@ -54,14 +54,14 @@
                                 if (!service.IsUp)
                                 {
                                     <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="start" asp-route-serviceLabel="@service.Label" method="post">
-                                        <button class="btn btn-success">Start</button>
+                                        <button class="btn btn-success shadow-none">Start</button>
                                     </form>
 
                                 }
                                 else
                                 {
                                     <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="@service.Label" method="post">
-                                        <button class="btn btn-danger" onclick="return confirm('Are you sure ?')">Stop</button>
+                                        <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@service.Label\' ?')">Stop</button>
                                     </form>
                                 }
                             }
