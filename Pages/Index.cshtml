@@ -10,33 +10,44 @@
         <h2>@server.Label</h2>
         <h3>@server.MAC</h3>
 
-        <div class="paragraph">
-            <h3>@server.IP</h3>
-            <span>Host is </span>
-            <span style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</span>
-            @if (!server.IsServerUp)
-            {
-                <form style="display: inline" asp-route-mac="@server.MAC" asp-route-mode="start" method="post">
-                    <button class="btn btn-success shadow-none">Start</button>
-                </form>
-            }
-            else if (@server.Port != 0)
-            {
-                <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="wol" method="post">
-                    <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@server.Label\' ?')">Stop</button>
-                </form>
-            }
-        </div>
+        <table class="table">
+            <tbody class="tbody">
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(server.Icon))
+                        {
+                            <img src="@server.Icon" alt="@server.Label" />
+                        }
+                    </td>
+                    <td>Host '@server.Label' is </td>
+                    <td style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</td>
+                    <td>
+                        @if (!server.IsServerUp)
+                        {
+                            <form style="display: inline" asp-route-mac="@server.MAC" asp-route-mode="start" method="post">
+                                <button class="btn btn-success shadow-none">Start</button>
+                            </form>
+                        }
+                        else if (@server.Port != 0)
+                        {
+                            <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="wol" method="post">
+                                <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@server.Label\' ?')">Stop</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
 
-        if (@server.IsServerUp && @server.Port != 0)
-        {
-            <div class="paragraph">
-                <span>API is </span>
-                <span style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</span>
-            </div>
-
-            <table class="table">
-                <tbody class="tbody">
+                @if (server.IsServerUp && server.Port != 0)
+                {
+                    <tr>
+                        <td>
+                            <img src="/wol.png" alt="wol" />
+                        </td>
+                        <td>API 'WakeOnLan' is </td>
+                        <td style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</td>
+                        <td>
+                        </td>
+                    </tr>
                     @foreach (var service in server.Services)
                     {
                         <tr>
@@ -68,9 +79,10 @@
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        }
+                }
+
+            </tbody>
+        </table>
 
         <hr/>
     }

@@ -15,6 +15,7 @@ public class Service
 public class WakeOnLan
 {
     public string Label { get; set; }
+    public string Icon { get; set; }
     public string MAC { get; set; }
     public int Port { get; set; }
 
