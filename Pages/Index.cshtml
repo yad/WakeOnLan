@@ -25,7 +25,7 @@
                             <img src="@server.Icon" alt="@server.Label" />
                         }
                     </td>
-                    <td class="host">MB '@server.Label'</td>
+                    <td class="host">@server.Label</td>
                     <td style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</td>
                     <td>
                         @if (!server.IsServerUp)
