@@ -47,8 +47,39 @@ tr td {
   vertical-align: middle;
 }
 
+.separator {
+  height: 100px!important;
+}
+
+.separator:first-child {
+  display: none;
+}
+
+.separator img {
+  filter: grayscale(1);
+  width: 32px;
+  height: 32px;
+}
+
+.host {
+  font-weight: bold;
+}
+
+.api {
+  color: #646464;
+  font-weight: bold;
+}
+
+.service {
+  color: #646464;
+}
+
 tr td:nth-child(2) {
   text-align: left;
+}
+
+tr td:nth-child(4) {
+  min-width: 91px;
 }
 
 td img {

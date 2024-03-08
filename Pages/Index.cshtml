@@ -5,13 +5,14 @@
 }
 
 <div class="text-center">
-    @foreach (var server in Model.WakeOnLanServers)
-    {
-        <h2>@server.Label</h2>
-        <h3>@server.MAC</h3>
+    <table class="table">
+        <tbody class="tbody">
+            @foreach (var server in Model.WakeOnLanServers)
+            {
+                <tr class="separator"><td colspan="4"><img src="/wol.png" alt="wol" /></td></tr>
+                <tr><td colspan="4"><h2>@server.Label</h2></td></tr>
+                <tr><td colspan="4"><h3>@server.MAC</h3></td></tr>
 
-        <table class="table">
-            <tbody class="tbody">
                 <tr>
                     <td>
                         @if (!string.IsNullOrEmpty(server.Icon))
@@ -19,7 +20,7 @@
                             <img src="@server.Icon" alt="@server.Label" />
                         }
                     </td>
-                    <td>Host '@server.Label' is </td>
+                    <td class="host">Host '@server.Label' is </td>
                     <td style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</td>
                     <td>
                         @if (!server.IsServerUp)
@@ -34,16 +35,19 @@
                                 <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@server.Label\' ?')">Stop</button>
                             </form>
                         }
+                        else
+                        {
+                        }
                     </td>
                 </tr>
 
-                @if (server.IsServerUp && server.Port != 0)
+                @if (server.Port != 0)
                 {
                     <tr>
                         <td>
                             <img src="/wol.png" alt="wol" />
                         </td>
-                        <td>API 'WakeOnLan' is </td>
+                        <td class="api">API 'WakeOnLan' is </td>
                         <td style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</td>
                         <td>
                         </td>
@@ -57,7 +61,7 @@
                                     <img src="@service.Icon" alt="@service.Label" />
                                 }
                             </td>
-                            <td>Service '@service.Label' is </td>
+                            <td class="service">Service '@service.Label' is </td>
                             <td style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</td>
                             <td>
                             @if (server.IsApiUp)
@@ -80,10 +84,7 @@
                         </tr>
                     }
                 }
-
-            </tbody>
-        </table>
-
-        <hr/>
-    }
+            }
+        </tbody>
+    </table>
 </div>
