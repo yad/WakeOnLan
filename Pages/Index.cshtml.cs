@@ -12,14 +12,14 @@ public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     private readonly IOptions<WakeOnLanSettings> _settings;
-    private readonly NetworkFinder _macFinder;
+    private readonly NetworkFinder _networkFinder;
     public IReadOnlyCollection<WakeOnLan> WakeOnLanServers = Array.Empty<WakeOnLan>();
 
     public IndexModel(ILogger<IndexModel> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
     {
         _logger = logger;
         _settings = settings;
-        _macFinder = networkFinder;
+        _networkFinder = networkFinder;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -41,11 +41,13 @@ public class IndexModel : PageModel
 
         foreach (var server in WakeOnLanServers)
         {
-            server.IP = _macFinder.FindIPFromMacAddress(server.MAC);
-            if (server.IP == null)
+            server.IP = _networkFinder.FindIPFromMacAddress(server.MAC);
+            if (string.IsNullOrEmpty(server.IP))
             {
                 continue;
             }
+
+            server.HostName = _networkFinder.GetHostName(server.IP);
 
             try
             {

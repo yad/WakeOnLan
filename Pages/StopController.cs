@@ -20,7 +20,7 @@ public class StopController : ControllerBase
     }
 
     [HttpGet("{serviceLabel}")]
-    public async Task<IActionResult> GetAsync(string serviceLabel)
+    public IActionResult Get(string serviceLabel)
     {
         if (serviceLabel == "wol")
         {
@@ -55,7 +55,7 @@ public class StopController : ControllerBase
             {
                 process.Kill();
             }
-        }        
+        }
 
         return Ok();
     }

@@ -20,7 +20,7 @@ public class StartController : ControllerBase
     }
 
     [HttpGet("{serviceLabel}")]
-    public async Task<IActionResult> GetAsync(string serviceLabel)
+    public IActionResult Get(string serviceLabel)
     {
         if (serviceLabel == "wol")
         {
@@ -58,5 +58,5 @@ public class StartController : ControllerBase
         Process.Start(startInfo);
 
         return Ok();
-    }    
+    }
 }

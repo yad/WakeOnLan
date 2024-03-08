@@ -6,7 +6,8 @@ public class FileLogger : ILogger
     {
         filePath = path;
     }
-    public IDisposable BeginScope<TState>(TState state)
+
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
         return null;
     }
@@ -17,7 +18,7 @@ public class FileLogger : ILogger
         return true;
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         if (formatter != null)
         {
@@ -26,8 +27,11 @@ public class FileLogger : ILogger
                 string fullFilePath = Path.Combine(filePath, DateTime.Now.ToString("yyyy-MM-dd") + "_log.txt");
                 var n = Environment.NewLine;
                 string exc = "";
-                if (exception != null) exc = n + exception.GetType() + ": " + exception.Message + n + exception.StackTrace + n;
-                File.AppendAllText(fullFilePath, logLevel.ToString() + ": " + DateTime.Now.ToString() + " " + formatter(state, exception) + n + exc);
+                if (exception != null)
+                {
+                    exc = n + exception.GetType() + ": " + exception.Message + n + exception.StackTrace + n;
+                    File.AppendAllText(fullFilePath, logLevel.ToString() + ": " + DateTime.Now.ToString() + " " + formatter(state, exception) + n + exc);
+                }
             }
         }
     }

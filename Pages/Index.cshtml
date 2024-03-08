@@ -11,7 +11,12 @@
             {
                 <tr class="separator"><td colspan="4"><img src="/wol.png" alt="wol" /></td></tr>
                 <tr><td colspan="4"><h2>@server.Label</h2></td></tr>
-                <tr><td colspan="4"><h3>@server.MAC</h3></td></tr>
+                <tr><td colspan="4" class="title"><span>@server.MAC</span></td></tr>
+
+                @if (!string.IsNullOrEmpty(server.HostName) && !string.IsNullOrEmpty(server.IP))
+                {
+                    <tr><td colspan="4" class="title"><span>@server.HostName @server.IP</span></td></tr>
+                }
 
                 <tr>
                     <td>
@@ -20,7 +25,7 @@
                             <img src="@server.Icon" alt="@server.Label" />
                         }
                     </td>
-                    <td class="host">Host '@server.Label' is </td>
+                    <td class="host">MB '@server.Label'</td>
                     <td style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</td>
                     <td>
                         @if (!server.IsServerUp)
@@ -47,7 +52,7 @@
                         <td>
                             <img src="/wol.png" alt="wol" />
                         </td>
-                        <td class="api">API 'WakeOnLan' is </td>
+                        <td class="api">API 'WakeOnLan'</td>
                         <td style="font-weight: bold; color: @(server.IsApiUp ? "green" : "red")">@(server.IsApiUp ? "UP" : "DOWN")</td>
                         <td>
                         </td>
@@ -61,7 +66,7 @@
                                     <img src="@service.Icon" alt="@service.Label" />
                                 }
                             </td>
-                            <td class="service">Service '@service.Label' is </td>
+                            <td class="service">Service '@service.Label'</td>
                             <td style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</td>
                             <td>
                             @if (server.IsApiUp)
