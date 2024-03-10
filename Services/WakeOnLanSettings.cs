@@ -11,8 +11,15 @@ public class Service
     public int Port { get; set; }
     public bool OnDemand { get; set; }
     public string Api { get; internal set; } = "";
-    public bool? IsUp { get; internal set; }
+    public ApiStatus ApiStatus { get; internal set; }
 }
+
+    public enum ApiStatus
+    {
+        Down,
+        Loading,
+        Up
+    }
 
 public class WakeOnLan
 {

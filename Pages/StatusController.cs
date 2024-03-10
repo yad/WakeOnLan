@@ -47,7 +47,7 @@ public class StatusController : ControllerBase
         {
             try
             {
-                using (TcpClient tcpClient = new TcpClient())
+                using (TcpClient tcpClient = new TcpClient() { ReceiveTimeout = 500 })
                 {
                     tcpClient.Connect("127.0.0.1", service.Port);
                     return Content("Process UP");

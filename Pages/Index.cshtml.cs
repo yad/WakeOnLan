@@ -93,20 +93,21 @@ public class IndexModel : PageModel
                 {
                     try
                     {
-                        using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
+                        using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(100) })
                         {
                             service.Api = $"http://{server.IP}:{server.Port}/api/status/{service.Label}";
                             var result = await client.GetAsync(service.Api);
+                            // Console.WriteLine(result.StatusCode);
                             switch (result.StatusCode)
                             {
                                 case HttpStatusCode.OK:
-                                    service.IsUp = true;
+                                    service.ApiStatus = ApiStatus.Up;
                                     break;
                                 case HttpStatusCode.Accepted:
-                                    service.IsUp = null;
+                                    service.ApiStatus = ApiStatus.Loading;
                                     break;
                                 default:
-                                    service.IsUp = false;
+                                    service.ApiStatus = ApiStatus.Down;
                                     break;
                             }
                         }
