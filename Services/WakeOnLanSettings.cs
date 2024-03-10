@@ -5,11 +5,13 @@ public class WakeOnLanSettings : List<WakeOnLan>
 public class Service
 {
     public string Label { get; set; } = "";
+    public string Link { get; set; } = "";
     public string Icon { get; set; } = "";
     public string Process { get; set; } = "";
     public int Port { get; set; }
+    public bool OnDemand { get; set; }
     public string Api { get; internal set; } = "";
-    public bool IsUp { get; internal set; }
+    public bool? IsUp { get; internal set; }
 }
 
 public class WakeOnLan

@@ -40,13 +40,18 @@ public class StopController : ControllerBase
         var server = WakeOnLanServers.FirstOrDefault(server => server.MAC == mac);
         if (server == null)
         {
-            throw new Exception("127.0.0.1");
+            throw new InvalidOperationException("127.0.0.1");
         }
 
         var service = server.Services.FirstOrDefault(service => service.Label == serviceLabel);
         if (service == null)
         {
-            throw new Exception(serviceLabel);
+            throw new InvalidOperationException(serviceLabel);
+        }
+
+        if (!service.OnDemand)
+        {
+            throw new InvalidOperationException($"{serviceLabel} - not OnDemand");
         }
 
         foreach (var process in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)))

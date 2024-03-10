@@ -41,6 +41,11 @@ public class StartController : ControllerBase
             throw new Exception(serviceLabel);
         }
 
+        if (!service.OnDemand)
+        {
+            throw new InvalidOperationException($"{serviceLabel} - not OnDemand");
+        }
+
         if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
         {
             return Content("Process UP");

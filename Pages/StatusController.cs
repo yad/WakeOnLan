@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -6,13 +8,13 @@ namespace wol.Pages;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TestController : ControllerBase
+public class StatusController : ControllerBase
 {
-     public readonly List<WakeOnLan> WakeOnLanServers;
-    private readonly ILogger<TestController> _logger;
+    public readonly List<WakeOnLan> WakeOnLanServers;
+    private readonly ILogger<StatusController> _logger;
     private readonly NetworkFinder _networkFinder;
 
-    public TestController(ILogger<TestController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public StatusController(ILogger<StatusController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
     {
         _logger = logger;
         WakeOnLanServers = settings.Value;
@@ -43,11 +45,21 @@ public class TestController : ControllerBase
 
         if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
         {
-            return Content("Process UP");
+            try
+            {
+                using (TcpClient tcpClient = new TcpClient())
+                {
+                    tcpClient.Connect("127.0.0.1", service.Port);
+                    return Content("Process UP");
+                }
+            }
+            catch (SocketException)
+            {
+            }
+
+            return Accepted();
         }
 
-        // Console.WriteLine(string.Join(Environment.NewLine, Process.GetProcesses().Select(p => p.ProcessName)));
-
         return NoContent();
-    }    
+    }
 }

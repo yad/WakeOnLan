@@ -66,12 +66,19 @@
                                     <img src="@service.Icon" alt="@service.Label" />
                                 }
                             </td>
-                            <td class="service">Service '@service.Label'</td>
-                            <td style="font-weight: bold; color: @(service.IsUp ? "green" : "red")">@(service.IsUp ? "UP" : "DOWN")</td>
-                            <td>
-                            @if (server.IsApiUp)
+                            @if (string.IsNullOrEmpty(service.Link))
                             {
-                                if (!service.IsUp)
+                                <td class="service">Service '@service.Label'</td>
+                            }
+                            else
+                            {
+                                <td class="service"><span>Service '</span><a href="@service.Link" target="_blank">@service.Label</a><span>'</span></td>
+                            }
+                            <td style="font-weight: bold; color: @(!service.IsUp.HasValue ? "orange" : service.IsUp.Value ? "green" : "red")">@(!service.IsUp.HasValue ? "LOADING" : service.IsUp.Value ? "UP" : "DOWN")</td>
+                            <td>
+                            @if (server.IsApiUp && service.OnDemand && service.IsUp.HasValue)
+                            {
+                                if (!service.IsUp.Value)
                                 {
                                     <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="start" asp-route-serviceLabel="@service.Label" method="post">
                                         <button class="btn btn-success shadow-none">Start</button>

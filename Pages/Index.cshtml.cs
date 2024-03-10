@@ -27,15 +27,17 @@ public class IndexModel : PageModel
         WakeOnLanServers = _settings.Value.Select(server => new WakeOnLan()
         {
             Label = server.Label,
-            Icon = $"/{Uri.EscapeDataString(server.Label)}.png",
+            Icon = $"/logo/{Uri.EscapeDataString(server.Label)}.png",
             MAC = server.MAC,
             Port = server.Port,
             Services = server.Services.Select(service => new Service()
             {
                 Label = service.Label,
-                Icon = $"/{service.Process.Split(new[]{'/', '\\', '.'}).Reverse().Skip(1).First()}.png",
+                Link = service.Link,
+                Icon = $"/logo/{service.Process.Split(new[]{'/', '\\', '.'}).Reverse().Skip(1).First()}.png",
                 Process = service.Process,
-                Port = service.Port
+                Port = service.Port,
+                OnDemand = service.OnDemand
             }).ToList()
         }).ToArray();
 
@@ -76,9 +78,9 @@ public class IndexModel : PageModel
             {
                 using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
                 {
-                    server.Api = $"http://{server.IP}:{server.Port}/api/test/wol"; // todo add check socket
+                    server.Api = $"http://{server.IP}:{server.Port}/api/status/wol";
                     var result = await client.GetAsync(server.Api);
-                    server.IsApiUp = result.StatusCode == System.Net.HttpStatusCode.OK;
+                    server.IsApiUp = result.StatusCode == HttpStatusCode.OK;
                 }
             }
             catch (TaskCanceledException)
@@ -93,9 +95,20 @@ public class IndexModel : PageModel
                     {
                         using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
                         {
-                            service.Api = $"http://{server.IP}:{server.Port}/api/test/{service.Label}"; // todo add check socket
+                            service.Api = $"http://{server.IP}:{server.Port}/api/status/{service.Label}";
                             var result = await client.GetAsync(service.Api);
-                            service.IsUp = result.StatusCode == System.Net.HttpStatusCode.OK;
+                            switch (result.StatusCode)
+                            {
+                                case HttpStatusCode.OK:
+                                    service.IsUp = true;
+                                    break;
+                                case HttpStatusCode.Accepted:
+                                    service.IsUp = null;
+                                    break;
+                                default:
+                                    service.IsUp = false;
+                                    break;
+                            }
                         }
                     }
                     catch (TaskCanceledException)
