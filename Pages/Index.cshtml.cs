@@ -27,7 +27,7 @@ public class IndexModel : PageModel
         WakeOnLanServers = _settings.Value.Select(server => new WakeOnLan()
         {
             Label = server.Label,
-            Icon = "",
+            Icon = $"/{Uri.EscapeDataString(server.Label)}.png",
             MAC = server.MAC,
             Port = server.Port,
             Services = server.Services.Select(service => new Service()
