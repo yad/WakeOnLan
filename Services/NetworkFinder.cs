@@ -49,6 +49,7 @@ public class NetworkFinder
                     if (!string.IsNullOrEmpty(ipAddress) && ipAddress != "127.0.0.1")
                     {
                         map.Add(new IPAndMac { IP = ipAddress, MAC = macAddress });
+                        map.Add(new IPAndMac { IP = "127.0.0.1", MAC = macAddress });
                     }
                 }
             }
