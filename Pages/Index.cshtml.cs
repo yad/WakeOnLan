@@ -23,6 +23,17 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+        FillWakeOnLanServers();
+
+        await TestAllUp();
+        await UpdateAllServers();
+        await UpdateAllServices();
+
+        return Page();
+    }
+
+    private void FillWakeOnLanServers()
+    {
         WakeOnLanServers = _settings.Value.Select(server => new WakeOnLan()
         {
             Label = server.Label,
@@ -39,12 +50,6 @@ public class IndexModel : PageModel
                 OnDemand = service.OnDemand
             }).ToList()
         }).ToArray();
-
-        await TestAllUp();
-        await UpdateAllServers();
-        await UpdateAllServices();
-
-        return Page();
     }
 
     private async Task TestAllUp()
