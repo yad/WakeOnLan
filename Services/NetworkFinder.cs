@@ -101,7 +101,8 @@ public class NetworkFinder
             {
                 return entry.HostName
                     .Replace(".local", "")
-                    .Replace(".home", "");
+                    .Replace(".home", "")
+                    .ToUpper();
             }
         }
         catch (SocketException)
