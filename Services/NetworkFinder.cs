@@ -5,6 +5,8 @@ using System.Net.Sockets;
 
 public class NetworkFinder
 {
+    public static string LoopBackIp = "127.0.0.1";
+
     private Lazy<IReadOnlyCollection<IPAndMac>> _map = new Lazy<IReadOnlyCollection<IPAndMac>>(InitializeGetIPsAndMac);
 
     private static IReadOnlyCollection<IPAndMac> InitializeGetIPsAndMac()
@@ -29,7 +31,7 @@ public class NetworkFinder
 
                     if (ip != null && mac != null)
                     {
-                        map.Add(new IPAndMac { IP = ip, MAC = mac });
+                        map.Add(new IPAndMac { Ip = ip, Mac = mac });
                     }
                 }
             }
@@ -46,10 +48,9 @@ public class NetworkFinder
                     .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork))
                 {
                     var ipAddress = address.Address.ToString();
-                    if (!string.IsNullOrEmpty(ipAddress) && ipAddress != "127.0.0.1")
+                    if (!string.IsNullOrEmpty(ipAddress) && ipAddress != LoopBackIp)
                     {
-                        map.Add(new IPAndMac { IP = ipAddress, MAC = macAddress });
-                        map.Add(new IPAndMac { IP = "127.0.0.1", MAC = macAddress });
+                        map.Add(new IPAndMac { Ip = ipAddress, Mac = macAddress, IsLoopBack = true });
                     }
                 }
             }
@@ -77,20 +78,27 @@ public class NetworkFinder
 
     public string FindIPFromMacAddress(string macAddress)
     {
-        IPAndMac? item = _map.Value.SingleOrDefault(x => x.MAC == macAddress);
-        return item?.IP ?? "";
+        IPAndMac? item = _map.Value.SingleOrDefault(x => x.Mac == macAddress);
+        return item?.Ip ?? "";
+    }
+
+    public string FindMacFromLoopBackIPAddress()
+    {
+        IPAndMac? item = _map.Value.SingleOrDefault(x => x.IsLoopBack);
+        return item?.Mac ?? "";
     }
 
     public string FindMacFromIPAddress(string ip)
     {
-        IPAndMac? item = _map.Value.SingleOrDefault(x => x.IP == ip);
-        return item?.MAC ?? "";
+        IPAndMac? item = _map.Value.SingleOrDefault(x => x.Ip == ip);
+        return item?.Mac ?? "";
     }
 
     private class IPAndMac
     {
-        public string? IP { get; set; }
-        public string? MAC { get; set; }
+        public string Ip { get; set; } = "";
+        public string Mac { get; set; } = "";
+        public bool IsLoopBack { get; internal set; }
     }
 
     public string GetHostName(string ipAddress)

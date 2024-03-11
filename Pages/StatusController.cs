@@ -29,18 +29,18 @@ public class StatusController : ControllerBase
             return Content("Minion UP");
         }
 
-        var mac = _networkFinder.FindMacFromIPAddress("127.0.0.1");
+        var mac = _networkFinder.FindMacFromLoopBackIPAddress();
 
         var server = WakeOnLanServers.FirstOrDefault(server => server.MAC == mac);
         if (server == null)
         {
-            throw new Exception("127.0.0.1");
+            throw new InvalidOperationException($"{mac} - no IP");
         }
 
         var service = server.Services.FirstOrDefault(service => service.Label == serviceLabel);
         if (service == null)
         {
-            throw new Exception(serviceLabel);
+            throw new InvalidOperationException(serviceLabel);
         }
 
         if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
