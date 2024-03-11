@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
@@ -34,13 +33,23 @@ public class IndexModel : PageModel
             {
                 Label = service.Label,
                 Link = service.Link,
-                Icon = $"/logo/{service.Process.Split(new[]{'/', '\\', '.'}).Reverse().Skip(1).First()}.png",
+                Icon = $"/logo/{service.Process.Split(['/', '\\', '.']).Reverse().Skip(1).First()}.png",
                 Process = service.Process,
                 Port = service.Port,
                 OnDemand = service.OnDemand
             }).ToList()
         }).ToArray();
 
+        await TestAllUp();
+        await UpdateAllServers();
+        await UpdateAllServices();
+
+        return Page();
+    }
+
+    private async Task TestAllUp()
+    {
+        var tasks = new List<Task>();
         foreach (var server in WakeOnLanServers)
         {
             server.IP = _networkFinder.FindIPFromMacAddress(server.MAC);
@@ -51,19 +60,32 @@ public class IndexModel : PageModel
 
             server.HostName = _networkFinder.GetHostName(server.IP);
 
-            try
-            {
-                using (Ping ping = new Ping())
-                {
-                    var reply = await ping.SendPingAsync(server.IP);
-                    server.IsServerUp = reply.Status == IPStatus.Success;
-                }
-            }
-            catch (PingException)
-            {
-                server.IsServerUp = true;
-            }
+            tasks.Add(TestUp(server));
+        }
+        await Task.WhenAll(tasks);
+    }
 
+    private static async Task TestUp(WakeOnLan server)
+    {
+        try
+        {
+            using (Ping ping = new Ping())
+            {
+                var reply = await ping.SendPingAsync(server.IP);
+                server.IsServerUp = reply.Status == IPStatus.Success;
+            }
+        }
+        catch (PingException)
+        {
+            server.IsServerUp = true;
+        }
+    }
+
+    private async Task UpdateAllServers()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var server in WakeOnLanServers)
+        {
             if (!server.IsServerUp)
             {
                 continue;
@@ -74,52 +96,71 @@ public class IndexModel : PageModel
                 continue;
             }
 
-            try
-            {
-                using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
-                {
-                    server.Api = $"http://{server.IP}:{server.Port}/api/status/wol";
-                    var result = await client.GetAsync(server.Api);
-                    server.IsApiUp = result.StatusCode == HttpStatusCode.OK;
-                }
-            }
-            catch (TaskCanceledException)
-            {
-            }
+            tasks.Add(UpdateServer(server));
+        }
+        await Task.WhenAll(tasks);
+    }
 
+    private static async Task UpdateServer(WakeOnLan server)
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
+            {
+                server.Api = $"http://{server.IP}:{server.Port}/api/status/wol";
+                var result = await client.GetAsync(server.Api);
+                server.IsApiUp = result.StatusCode == HttpStatusCode.OK;
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            server.IsApiUp = false;
+        }
+    }
+
+    private async Task UpdateAllServices()
+    {
+        List<Task> tasks = new List<Task>();
+        foreach (var server in WakeOnLanServers)
+        {
             if (server.IsApiUp)
             {
                 foreach (var service in server.Services)
                 {
-                    try
-                    {
-                        using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(100) })
-                        {
-                            service.Api = $"http://{server.IP}:{server.Port}/api/status/{service.Label}";
-                            var result = await client.GetAsync(service.Api);
-                            // Console.WriteLine(result.StatusCode);
-                            switch (result.StatusCode)
-                            {
-                                case HttpStatusCode.OK:
-                                    service.ApiStatus = ApiStatus.Up;
-                                    break;
-                                case HttpStatusCode.Accepted:
-                                    service.ApiStatus = ApiStatus.Loading;
-                                    break;
-                                default:
-                                    service.ApiStatus = ApiStatus.Down;
-                                    break;
-                            }
-                        }
-                    }
-                    catch (TaskCanceledException)
-                    {
-                    }
+                    tasks.Add(UpdateService(server, service));
                 }
             }
         }
+        await Task.WhenAll(tasks);
+    }
 
-        return Page();
+    private static async Task UpdateService(WakeOnLan server, Service service)
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
+            {
+                service.Api = $"http://{server.IP}:{server.Port}/api/status/{service.Label}";
+                var result = await client.GetAsync(service.Api);
+                // Console.WriteLine(result.StatusCode);
+                switch (result.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        service.ApiStatus = ApiStatus.Up;
+                        break;
+                    case HttpStatusCode.Accepted:
+                        service.ApiStatus = ApiStatus.Loading;
+                        break;
+                    default:
+                        service.ApiStatus = ApiStatus.Down;
+                        break;
+                }
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            service.ApiStatus = ApiStatus.Down;
+        }
     }
 
     public async Task<IActionResult> OnPostAsync(string ip, string port, string mode, string serviceLabel, string mac)
@@ -149,6 +190,7 @@ public class IndexModel : PageModel
         catch (TaskCanceledException)
         {
         }
+
         return RedirectToPage("/Index");
     }
 }

@@ -22,7 +22,7 @@ public class NetworkFinder
 
                 if (line != null)
                 {
-                    var parts = line.ToUpper().Replace("-", ":").Split(' ').Select(p => p.Trim()).Select(p => p.Trim(new[] { '(', ')' })).ToArray();
+                    var parts = line.ToUpper().Replace("-", ":").Split(' ').Select(p => p.Trim()).Select(p => p.Trim(['(', ')'])).ToArray();
 
                     var ip = parts.FirstOrDefault(p => IPAddress.TryParse(p, out IPAddress? _));
                     var mac = parts.FirstOrDefault(p => p.Length == 17 && p.Count(c => c == ':') == 5);
@@ -35,25 +35,24 @@ public class NetworkFinder
             }
         }
 
-        // Console.WriteLine("=========");
-
-        var macAddresses = NetworkInterface.GetAllNetworkInterfaces()
-            .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
-            .Select(nic => nic.GetPhysicalAddress().ToString())
-            .Where(macAddress => !string.IsNullOrEmpty(macAddress))
-            .Where(macAddress => macAddress != "00:00:00:00:00:00");
-
-        foreach (var macAddress in macAddresses)
+        foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces()
+            .Where(networkInterface => networkInterface.OperationalStatus == OperationalStatus.Up))
         {
-            map.Add(new IPAndMac { IP = "127.0.0.1", MAC = string.Join(':', macAddress.Chunk(2).Select(c => new string(c))) });
-        };
-
-        // foreach (var item in map)
-        // {
-        //     Console.WriteLine($"{item.IP} {item.MAC}");
-        // }
-
-        // Console.WriteLine("=========");
+            var macAddress = string.Join(':', networkInterface.GetPhysicalAddress().ToString().Chunk(2).Select(c => new string(c)));
+            if (!string.IsNullOrEmpty(macAddress) && macAddress != "00:00:00:00:00:00")
+            {
+                var addresses = networkInterface.GetIPProperties().UnicastAddresses;
+                foreach (var address in addresses
+                    .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork))
+                {
+                    var ipAddress = address.Address.ToString();
+                    if (!string.IsNullOrEmpty(ipAddress) && ipAddress != "127.0.0.1")
+                    {
+                        map.Add(new IPAndMac { IP = ipAddress, MAC = macAddress });
+                    }
+                }
+            }
+        }
 
         return map.ToArray();
     }
@@ -100,7 +99,9 @@ public class NetworkFinder
             IPHostEntry entry = Dns.GetHostEntry(ipAddress);
             if (entry != null)
             {
-                return entry.HostName;
+                return entry.HostName
+                    .Replace(".local", "")
+                    .Replace(".home", "");
             }
         }
         catch (SocketException)

@@ -45,16 +45,12 @@ public class StatusController : ControllerBase
 
         if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
         {
-            try
+            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            var tcpListener = ipGlobalProperties.GetActiveTcpListeners();
+
+            if (tcpListener.Any(listener => listener.Port == service.Port))
             {
-                using (TcpClient tcpClient = new TcpClient() { ReceiveTimeout = 500 })
-                {
-                    tcpClient.Connect("127.0.0.1", service.Port);
-                    return Content("Process UP");
-                }
-            }
-            catch (SocketException)
-            {
+                return Content("Process UP");
             }
 
             return Accepted();
