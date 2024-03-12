@@ -8,15 +8,12 @@ namespace wol.Pages;
 [Route("api/[controller]")]
 public class StartController : ControllerBase
 {
-     public readonly List<WakeOnLan> WakeOnLanServers;
+    public readonly List<WakeOnLan> WakeOnLanServers;
     private readonly ILogger<StartController> _logger;
-    private readonly NetworkFinder _networkFinder;
-
-    public StartController(ILogger<StartController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public StartController(ILogger<StartController> logger, IOptions<WakeOnLanSettings> settings)
     {
         _logger = logger;
         WakeOnLanServers = settings.Value;
-        _networkFinder = networkFinder;
     }
 
     [HttpGet("{serviceLabel}")]
@@ -27,7 +24,7 @@ public class StartController : ControllerBase
             return Content("Minion UP");
         }
 
-        var mac = _networkFinder.FindMacFromLoopBackIPAddress();
+        var mac = NetworkFinderWorkerService.FindMacFromLoopBackIPAddress();
 
         var server = WakeOnLanServers.FirstOrDefault(server => server.MAC == mac);
         if (server == null)
@@ -56,7 +53,8 @@ public class StartController : ControllerBase
             WindowStyle = ProcessWindowStyle.Minimized,
             UseShellExecute = true,
 
-            WorkingDirectory = Path.GetDirectoryName(service.Process),
+            WorkingDirectory = string.IsNullOrEmpty(service.WorkingDirectory) ? Path.GetDirectoryName(service.Process) : service.WorkingDirectory,
+            Arguments = string.IsNullOrEmpty(service.Arguments) ? "" : service.Arguments,
             FileName = service.Process
         };
 

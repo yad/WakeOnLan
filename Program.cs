@@ -2,13 +2,16 @@
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddTransient<NetworkFinder>();
-builder.Services.Configure<WakeOnLanSettings>(builder.Configuration.GetSection("WakeOnLan")); 
+builder.Services.AddTransient<WakeOnLanServersBuilder>();
+builder.Services.Configure<WakeOnLanSettings>(builder.Configuration.GetSection("WakeOnLan"));
 builder.Services.AddLogging(loggingBuilder =>
 {
     loggingBuilder.AddConfiguration(builder.Configuration.GetSection("Logging"));
     loggingBuilder.AddFile(AppContext.BaseDirectory);
 });
+
+builder.Services.AddHostedService<NetworkFinderWorkerService>();
+builder.Services.AddHostedService<TcpListenerWorkerService>();
 
 var app = builder.Build();
 

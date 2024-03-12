@@ -3,16 +3,25 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-public class NetworkFinder
+public class NetworkFinderWorkerService : BackgroundService
 {
     public static string LoopBackIp = "127.0.0.1";
 
-    private Lazy<IReadOnlyCollection<IPAndMac>> _map = new Lazy<IReadOnlyCollection<IPAndMac>>(InitializeGetIPsAndMac);
+    private static IReadOnlyCollection<IpMac> IpMacMapCache { get; set; } = Array.Empty<IpMac>();
 
-    private static IReadOnlyCollection<IPAndMac> InitializeGetIPsAndMac()
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            IpMacMapCache = InitializeGetIPsAndMac();
+            await Task.Delay(5 * 1000, stoppingToken);
+        }
+    }
+
+    private static IReadOnlyCollection<IpMac> InitializeGetIPsAndMac()
     {
         // Console.WriteLine("InitializeGetIPsAndMac");
-        List<IPAndMac> map = new List<IPAndMac>();
+        List<IpMac> map = new List<IpMac>();
 
         var arpStream = ExecuteCommandLine("arp", "-a");
         if (arpStream != null)
@@ -31,7 +40,7 @@ public class NetworkFinder
 
                     if (ip != null && mac != null)
                     {
-                        map.Add(new IPAndMac { Ip = ip, Mac = mac });
+                        map.Add(new IpMac { Ip = ip, Mac = mac });
                     }
                 }
             }
@@ -50,7 +59,7 @@ public class NetworkFinder
                     var ipAddress = address.Address.ToString();
                     if (!string.IsNullOrEmpty(ipAddress) && ipAddress != LoopBackIp)
                     {
-                        map.Add(new IPAndMac { Ip = ipAddress, Mac = macAddress, IsLoopBack = true });
+                        map.Add(new IpMac { Ip = ipAddress, Mac = macAddress, IsLoopBack = true });
                     }
                 }
             }
@@ -76,32 +85,32 @@ public class NetworkFinder
         return process?.StandardOutput;
     }
 
-    public string FindIPFromMacAddress(string macAddress)
+    public static string FindIPFromMacAddress(string macAddress)
     {
-        IPAndMac? item = _map.Value.SingleOrDefault(x => x.Mac == macAddress);
+        IpMac? item = IpMacMapCache.SingleOrDefault(x => x.Mac == macAddress);
         return item?.Ip ?? "";
     }
 
-    public string FindMacFromLoopBackIPAddress()
+    public static string FindMacFromLoopBackIPAddress()
     {
-        IPAndMac? item = _map.Value.SingleOrDefault(x => x.IsLoopBack);
+        IpMac? item = IpMacMapCache.SingleOrDefault(x => x.IsLoopBack);
         return item?.Mac ?? "";
     }
 
-    public string FindMacFromIPAddress(string ip)
+    public static string FindMacFromIPAddress(string ip)
     {
-        IPAndMac? item = _map.Value.SingleOrDefault(x => x.Ip == ip);
+        IpMac? item = IpMacMapCache.SingleOrDefault(x => x.Ip == ip);
         return item?.Mac ?? "";
     }
 
-    private class IPAndMac
+    private class IpMac
     {
         public string Ip { get; set; } = "";
         public string Mac { get; set; } = "";
         public bool IsLoopBack { get; internal set; }
     }
 
-    public string GetHostName(string ipAddress)
+    public static string GetHostName(string ipAddress)
     {
         try
         {

@@ -10,13 +10,11 @@ public class StopController : ControllerBase
 {
     public readonly List<WakeOnLan> WakeOnLanServers;
     private readonly ILogger<StopController> _logger;
-    private readonly NetworkFinder _networkFinder;
 
-    public StopController(ILogger<StopController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public StopController(ILogger<StopController> logger, IOptions<WakeOnLanSettings> settings)
     {
         _logger = logger;
         WakeOnLanServers = settings.Value;
-        _networkFinder = networkFinder;
     }
 
     [HttpGet("{serviceLabel}")]
@@ -35,7 +33,7 @@ public class StopController : ControllerBase
             return Content("Minion UP");
         }
 
-        var mac = _networkFinder.FindMacFromLoopBackIPAddress();
+        var mac = NetworkFinderWorkerService.FindMacFromLoopBackIPAddress();
 
         var server = WakeOnLanServers.FirstOrDefault(server => server.MAC == mac);
         if (server == null)

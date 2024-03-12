@@ -8,6 +8,8 @@ public class Service
     public string Link { get; set; } = "";
     public string Icon { get; set; } = "";
     public string Process { get; set; } = "";
+    public string WorkingDirectory { get; set; } = "";
+    public string Arguments { get; set; } = "";
     public int Port { get; set; }
     public bool OnDemand { get; set; }
     public string Api { get; internal set; } = "";

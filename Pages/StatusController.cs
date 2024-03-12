@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace wol.Pages;
@@ -12,13 +13,11 @@ public class StatusController : ControllerBase
 {
     public readonly List<WakeOnLan> WakeOnLanServers;
     private readonly ILogger<StatusController> _logger;
-    private readonly NetworkFinder _networkFinder;
 
-    public StatusController(ILogger<StatusController> logger, IOptions<WakeOnLanSettings> settings, NetworkFinder networkFinder)
+    public StatusController(ILogger<StatusController> logger, IOptions<WakeOnLanSettings> settings)
     {
         _logger = logger;
         WakeOnLanServers = settings.Value;
-        _networkFinder = networkFinder;
     }
 
     [HttpGet("{serviceLabel}")]
@@ -29,7 +28,7 @@ public class StatusController : ControllerBase
             return Content("Minion UP");
         }
 
-        var mac = _networkFinder.FindMacFromLoopBackIPAddress();
+        var mac = NetworkFinderWorkerService.FindMacFromLoopBackIPAddress();
 
         var server = WakeOnLanServers.FirstOrDefault(server => server.MAC == mac);
         if (server == null)
@@ -45,9 +44,7 @@ public class StatusController : ControllerBase
 
         if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
         {
-            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            var tcpListener = ipGlobalProperties.GetActiveTcpListeners();
-
+            var tcpListener = TcpListenerWorkerService.GetTcpListenerCache();
             if (tcpListener.Any(listener => listener.Port == service.Port))
             {
                 return Content("Process UP");
