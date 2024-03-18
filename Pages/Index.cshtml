@@ -31,13 +31,13 @@
                         @if (!server.IsServerUp)
                         {
                             <form style="display: inline" asp-route-mac="@server.MAC" asp-route-mode="start" method="post">
-                                <button class="btn btn-success shadow-none">Start</button>
+                                <button class="btn btn-success shadow-none" onclick="onClick(event, '@server.Label')">Start</button>
                             </form>
                         }
                         else if (@server.Port != 0)
                         {
                             <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="wol" method="post">
-                                <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@server.Label\' ?')">Stop</button>
+                                <button class="btn btn-danger shadow-none" onclick="onClick(event, '@server.Label')">Stop</button>
                             </form>
                         }
                         else
@@ -81,14 +81,14 @@
                                 if (service.ApiStatus == ApiStatus.Down)
                                 {
                                     <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="start" asp-route-serviceLabel="@service.Label" method="post">
-                                        <button class="btn btn-success shadow-none">Start</button>
+                                        <button class="btn btn-success shadow-none" onclick="onClick(event, '@service.Label')">Start</button>
                                     </form>
 
                                 }
                                 else
                                 {
                                     <form style="display: inline" asp-route-ip="@server.IP" asp-route-port="@server.Port" asp-route-mode="stop" asp-route-serviceLabel="@service.Label" method="post">
-                                        <button class="btn btn-danger shadow-none" onclick="return confirm('Stop \'@service.Label\' ?')">Stop</button>
+                                        <button class="btn btn-danger shadow-none" onclick="onClick(event, '@service.Label')">Stop</button>
                                     </form>
                                 }
                             }

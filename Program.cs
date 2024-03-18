@@ -12,6 +12,7 @@ builder.Services.AddLogging(loggingBuilder =>
 
 builder.Services.AddHostedService<NetworkFinderWorkerService>();
 builder.Services.AddHostedService<TcpListenerWorkerService>();
+// builder.Services.AddHostedService<ProcessWorkerService>();
 
 var app = builder.Build();
 

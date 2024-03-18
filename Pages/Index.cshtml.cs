@@ -26,6 +26,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(string ip, string port, string mode, string serviceLabel, string mac)
     {
+        // Console.WriteLine($"ip {ip}, port {port}, mode {mode}, serviceLabel {serviceLabel}, mac {mac}");
         try
         {
             if (string.IsNullOrEmpty(mac) || mode == "stop")
