@@ -3,6 +3,24 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
+public static class Ext
+{
+    public static void AddUniq(this List<IpMac> that, IpMac ipMac)
+    {
+        if (!that.Any(i => i.Ip == ipMac.Ip && i.Mac == ipMac.Mac))
+        {
+            that.Add(ipMac);
+        }
+    }
+}
+
+public class IpMac
+{
+    public string Ip { get; set; } = "";
+    public string Mac { get; set; } = "";
+    public bool IsLoopBack { get; internal set; }
+}
+
 public class NetworkFinderWorkerService : BackgroundService
 {
     public static string LoopBackIp = "127.0.0.1";
@@ -40,7 +58,7 @@ public class NetworkFinderWorkerService : BackgroundService
 
                     if (ip != null && mac != null)
                     {
-                        map.Add(new IpMac { Ip = ip, Mac = mac });
+                        map.AddUniq(new IpMac { Ip = ip, Mac = mac });
                     }
                 }
             }
@@ -59,7 +77,7 @@ public class NetworkFinderWorkerService : BackgroundService
                     var ipAddress = address.Address.ToString();
                     if (!string.IsNullOrEmpty(ipAddress) && ipAddress != LoopBackIp)
                     {
-                        map.Add(new IpMac { Ip = ipAddress, Mac = macAddress, IsLoopBack = true });
+                        map.AddUniq(new IpMac { Ip = ipAddress, Mac = macAddress, IsLoopBack = true });
                     }
                 }
             }
@@ -96,7 +114,7 @@ public class NetworkFinderWorkerService : BackgroundService
         {
             Console.WriteLine("------------------");
             Console.WriteLine("FindIPFromMacAddress");
-            foreach(var entry in _ipMacMapCache)
+            foreach (var entry in _ipMacMapCache)
             {
                 Console.WriteLine($"{entry.Mac} {entry.Ip}");
             }
@@ -116,7 +134,7 @@ public class NetworkFinderWorkerService : BackgroundService
         {
             Console.WriteLine("------------------");
             Console.WriteLine("FindMacFromLoopBackIPAddress");
-            foreach(var entry in _ipMacMapCache)
+            foreach (var entry in _ipMacMapCache)
             {
                 Console.WriteLine($"{entry.Mac} {entry.Ip}");
             }
@@ -136,20 +154,13 @@ public class NetworkFinderWorkerService : BackgroundService
         {
             Console.WriteLine("------------------");
             Console.WriteLine("FindMacFromIPAddress");
-            foreach(var entry in _ipMacMapCache)
+            foreach (var entry in _ipMacMapCache)
             {
                 Console.WriteLine($"{entry.Mac} {entry.Ip}");
             }
             Console.WriteLine("------------------");
             throw;
         }
-    }
-
-    private class IpMac
-    {
-        public string Ip { get; set; } = "";
-        public string Mac { get; set; } = "";
-        public bool IsLoopBack { get; internal set; }
     }
 
     public static string GetHostName(string ipAddress)

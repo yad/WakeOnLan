@@ -1,5 +1,12 @@
 using System.Diagnostics;
 
+public class ProcessAndArguments
+{
+    public string Process { get; set; } = "";
+    public string ProcessId { get; set; } = "";
+    public string Arguments { get; set; } = "";
+}
+
 public class ProcessWorkerService : BackgroundService
 {
     private IReadOnlyCollection<ProcessAndArguments> _processArgumentsMapCache { get; set; } = Array.Empty<ProcessAndArguments>();
@@ -93,12 +100,5 @@ public class ProcessWorkerService : BackgroundService
         Process? process = Process.Start(startInfo);
 
         return process?.StandardOutput;
-    }
-
-    private class ProcessAndArguments
-    {
-        public string Process { get; set; } = "";
-        public string ProcessId { get; set; } = "";
-        public string Arguments { get; set; } = "";
     }
 }
