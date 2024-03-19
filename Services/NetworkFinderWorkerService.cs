@@ -105,62 +105,20 @@ public class NetworkFinderWorkerService : BackgroundService
 
     public static string FindIPFromMacAddress(string macAddress)
     {
-        try
-        {
-            IpMac? item = _ipMacMapCache.SingleOrDefault(x => x.Mac == macAddress);
-            return item?.Ip ?? "";
-        }
-        catch
-        {
-            Console.WriteLine("------------------");
-            Console.WriteLine("FindIPFromMacAddress");
-            foreach (var entry in _ipMacMapCache)
-            {
-                Console.WriteLine($"{entry.Mac} {entry.Ip}");
-            }
-            Console.WriteLine("------------------");
-            throw;
-        }
+        IpMac? item = _ipMacMapCache.SingleOrDefault(x => x.Mac == macAddress);
+        return item?.Ip ?? "";
     }
 
     public static string FindMacFromLoopBackIPAddress()
     {
-        try
-        {
-            IpMac? item = _ipMacMapCache.SingleOrDefault(x => x.IsLoopBack);
-            return item?.Mac ?? "";
-        }
-        catch
-        {
-            Console.WriteLine("------------------");
-            Console.WriteLine("FindMacFromLoopBackIPAddress");
-            foreach (var entry in _ipMacMapCache)
-            {
-                Console.WriteLine($"{entry.Mac} {entry.Ip}");
-            }
-            Console.WriteLine("------------------");
-            throw;
-        }
+        IpMac? item = _ipMacMapCache.SingleOrDefault(x => x.IsLoopBack);
+        return item?.Mac ?? "";
     }
 
     public static string FindMacFromIPAddress(string ip)
     {
-        try
-        {
-            IpMac? item = _ipMacMapCache.SingleOrDefault(x => x.Ip == ip);
-            return item?.Mac ?? "";
-        }
-        catch
-        {
-            Console.WriteLine("------------------");
-            Console.WriteLine("FindMacFromIPAddress");
-            foreach (var entry in _ipMacMapCache)
-            {
-                Console.WriteLine($"{entry.Mac} {entry.Ip}");
-            }
-            Console.WriteLine("------------------");
-            throw;
-        }
+        IpMac? item = _ipMacMapCache.SingleOrDefault(x => x.Ip == ip);
+        return item?.Mac ?? "";
     }
 
     public static string GetHostName(string ipAddress)
