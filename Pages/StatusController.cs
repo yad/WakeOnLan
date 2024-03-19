@@ -44,7 +44,7 @@ public class StatusController : ControllerBase
 
         if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
         {
-            var tcpListener = TcpListenerWorkerService.GetTcpListenerCache();
+            var tcpListener = TcpListenerWorkerService.GetTcpListeners();
             if (tcpListener.Any(listener => listener.Port == service.Port))
             {
                 return Content("Process UP");

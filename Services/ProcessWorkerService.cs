@@ -2,13 +2,13 @@ using System.Diagnostics;
 
 public class ProcessWorkerService : BackgroundService
 {
-    private IReadOnlyCollection<ProcessAndArguments> ProcessArgumentsMapCache { get; set; } = Array.Empty<ProcessAndArguments>();
+    private IReadOnlyCollection<ProcessAndArguments> _processArgumentsMapCache { get; set; } = Array.Empty<ProcessAndArguments>();
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            ProcessArgumentsMapCache = InitializeGetProcessesAndArguments();
+            _processArgumentsMapCache = InitializeGetProcessesAndArguments();
             await Task.Delay(5 * 1000, stoppingToken);
         }
     }
