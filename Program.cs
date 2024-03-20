@@ -2,6 +2,7 @@
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSingleton<VisitService>();
 builder.Services.AddTransient<WakeOnLanServersBuilder>();
 builder.Services.Configure<WakeOnLanSettings>(builder.Configuration.GetSection("WakeOnLan"));
 builder.Services.AddLogging(loggingBuilder =>
@@ -12,9 +13,11 @@ builder.Services.AddLogging(loggingBuilder =>
 
 builder.Services.AddHostedService<NetworkFinderWorkerService>();
 builder.Services.AddHostedService<TcpListenerWorkerService>();
-// builder.Services.AddHostedService<ProcessWorkerService>();
+builder.Services.AddHostedService<PingWorkerService>();
 
 var app = builder.Build();
+
+app.UseVisitor();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

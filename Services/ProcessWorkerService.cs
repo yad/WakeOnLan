@@ -11,11 +11,27 @@ public class ProcessWorkerService : BackgroundService
 {
     private IReadOnlyCollection<ProcessAndArguments> _processArgumentsMapCache { get; set; } = Array.Empty<ProcessAndArguments>();
 
+    private readonly VisitService _visitService;
+
+    public ProcessWorkerService(VisitService visitService)
+    {
+        _visitService = visitService;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _processArgumentsMapCache = InitializeGetProcessesAndArguments();
+            if (_visitService.IsActive)
+            {
+                _processArgumentsMapCache = InitializeGetProcessesAndArguments();
+            }
+            else
+            {
+                // Console.WriteLine($"{GetType().Name} is sleeping");
+                _processArgumentsMapCache = Array.Empty<ProcessAndArguments>();
+            }
+
             await Task.Delay(5 * 1000, stoppingToken);
         }
     }

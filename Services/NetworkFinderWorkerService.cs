@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-public static class Ext
+public static class NetworkFinderWorkerServiceExt
 {
     public static void AddUniq(this List<IpMac> that, IpMac ipMac)
     {
@@ -27,11 +27,27 @@ public class NetworkFinderWorkerService : BackgroundService
 
     private static IReadOnlyCollection<IpMac> _ipMacMapCache { get; set; } = Array.Empty<IpMac>();
 
+    private readonly VisitService _visitService;
+
+    public NetworkFinderWorkerService(VisitService visitService)
+    {
+        _visitService = visitService;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _ipMacMapCache = InitializeGetIPsAndMac();
+            if (_visitService.IsActive)
+            {
+                _ipMacMapCache = InitializeGetIPsAndMac();
+            }
+            else
+            {
+                // Console.WriteLine($"{GetType().Name} is sleeping");
+                _ipMacMapCache = Array.Empty<IpMac>();
+            }
+
             await Task.Delay(5 * 1000, stoppingToken);
         }
     }
