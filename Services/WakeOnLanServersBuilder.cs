@@ -109,7 +109,7 @@ public class WakeOnLanServersBuilder
     {
         try
         {
-            using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
+            using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(2000) })
             {
                 server.Api = $"http://{server.IP}:{server.Port}/api/status/wol";
                 var result = await client.GetAsync(server.Api);
@@ -145,7 +145,7 @@ public class WakeOnLanServersBuilder
     {
         try
         {
-            using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
+            using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(2000) })
             {
                 service.Api = $"http://{server.IP}:{server.Port}/api/status/{service.Label}";
                 var result = await client.GetAsync(service.Api);

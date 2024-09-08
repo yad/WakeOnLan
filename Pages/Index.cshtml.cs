@@ -31,7 +31,7 @@ public class IndexModel : PageModel
         {
             if (string.IsNullOrEmpty(mac) || mode == "stop")
             {
-                using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(500) })
+                using (HttpClient client = new HttpClient() { Timeout = TimeSpan.FromMilliseconds(2000) })
                 {
                     var api = $"http://{ip}:{port}/api/{mode}/{serviceLabel}";
                     // Console.WriteLine(api);

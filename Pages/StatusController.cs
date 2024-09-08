@@ -42,7 +42,8 @@ public class StatusController : ControllerBase
             throw new InvalidOperationException(serviceLabel);
         }
 
-        if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(service.Process)).Any())
+        var processes = Process.GetProcesses().Select(p => p.ProcessName);
+        if (processes.Any(p => p == service.Process))
         {
             var tcpListener = TcpListenerWorkerService.GetTcpListeners();
             if (tcpListener.Any(listener => listener.Port == service.Port))
