@@ -18,7 +18,7 @@ dotnet, download https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 `dotnet --version`
 
-# Build
+# Build ARM
 
 `useradd --system --no-create-home wol`
 
@@ -27,6 +27,16 @@ dotnet, download https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 `sudo chown -R wol:wol /opt/wol/`
 
 `sudo dotnet publish --runtime linux-arm --self-contained -o /opt/wol`
+
+# Build x64
+
+`useradd --system --no-create-home wol`
+
+`sudo mkdir -p /opt/wol`
+
+`sudo chown -R wol:wol /opt/wol/`
+
+`sudo dotnet publish --runtime linux-x64 --self-contained -o /opt/wol`
 
 # Register service
 
@@ -40,13 +50,27 @@ dotnet, download https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 `sudo systemctl status wol.service`
 
-# Update
+# Update ARM
 
 `git pull`
 
 `sudo systemctl stop wol.service`
 
 `sudo dotnet publish --runtime linux-arm --self-contained -o /opt/wol`
+
+`sudo chown -R wol:wol /opt/wol/`
+
+`sudo systemctl restart wol.service`
+
+`sudo systemctl status wol.service`
+
+# Update x64
+
+`git pull`
+
+`sudo systemctl stop wol.service`
+
+`sudo dotnet publish --runtime linux-x64 --self-contained -o /opt/wol`
 
 `sudo chown -R wol:wol /opt/wol/`
 

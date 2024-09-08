@@ -24,11 +24,20 @@ public class StopController : ControllerBase
         {
             try
             {
-                Process.Start("shutdown", "/s /t 30");
+                switch (Environment.OSVersion.Platform)
+                {
+                    case PlatformID.Win32NT:
+                        Process.Start("shutdown", "/f /s /t 30");
+                        break;
+                    case PlatformID.Unix:
+                        Process.Start("sudo", "shutdown -h 1");
+                        break;
+                }
+
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex, "shutdown /s /t 30");
+                _logger.LogError(ex, "shutdown");
             }
             return Content("Minion UP");
         }
