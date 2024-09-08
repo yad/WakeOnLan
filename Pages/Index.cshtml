@@ -10,13 +10,6 @@
             @foreach (var server in Model.WakeOnLanServers)
             {
                 <tr class="separator"><td colspan="4"><img src="/wol.png" alt="wol" /></td></tr>
-                <tr><td colspan="4"><h2>@server.Label</h2></td></tr>
-                <tr><td colspan="4" class="title"><span>@server.MAC</span></td></tr>
-
-                @if (!string.IsNullOrEmpty(server.HostName) && !string.IsNullOrEmpty(server.IP))
-                {
-                    <tr><td colspan="4" class="title"><span>@server.HostName @server.IP</span></td></tr>
-                }
 
                 <tr>
                     <td>
@@ -25,7 +18,23 @@
                             <img src="@server.Icon" alt="@server.Label" />
                         }
                     </td>
-                    <td class="host">@server.Label</td>
+                    <td class="host">
+                        <div>@server.Label</div>
+                        <ul style="font-size: 11px; list-style-type: none">
+                            @if (!string.IsNullOrEmpty(server.HostName))
+                            {
+                                <li>@server.HostName</li>
+                            }
+                            @if (!string.IsNullOrEmpty(server.IP))
+                            {
+                                <li>@server.IP</li>
+                            }
+                            @if (!string.IsNullOrEmpty(server.MAC))
+                            {
+                                <li>@server.MAC</li>
+                            }
+                        </ul>
+                    </td>
                     <td style="font-weight: bold; color: @(server.IsServerUp ? "green" : "red")">@(server.IsServerUp ? "UP" : "DOWN")</td>
                     <td>
                         @if (!server.IsServerUp)

@@ -4,19 +4,13 @@
 
 `sudo apt install git`
 
-dotnet, download https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+`wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh`
 
-`wget https://download.visualstudio.microsoft.com/download/pr/7ec1a911-afeb-47fa-a1d0-fa22cd980b32/157c20841cbf1811dd2a7a51bf4aaf88/dotnet-sdk-8.0.100-linux-arm.tar.gz`
+`chmod +x ./dotnet-install.sh`
 
-`sudo rm -rf /opt/dotnet`
+`./dotnet-install.sh --version latest`
 
-`sudo mkdir -p /opt/dotnet`
-
-`sudo tar -xf dotnet-sdk-8.0.100-linux-arm.tar.gz -C /opt/dotnet`
-
-`sudo ln -s /opt/dotnet/dotnet /usr/bin`
-
-`dotnet --version`
+`dotnet --info`
 
 # Build ARM
 
