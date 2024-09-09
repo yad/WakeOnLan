@@ -57,7 +57,7 @@
 
                 @if (server.Port != 0)
                 {
-                    <tr>
+                    <tr class="mid">
                         <td>
                             <img src="/wol.png" alt="wol" />
                         </td>
@@ -68,7 +68,7 @@
                     </tr>
                     @foreach (var service in server.Services)
                     {
-                        <tr>
+                        <tr class="mid">
                             <td>
                                 @if (!string.IsNullOrEmpty(service.Icon))
                                 {

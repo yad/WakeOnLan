@@ -48,7 +48,7 @@ tr td {
 }
 
 .separator {
-  height: 100px;
+  height: 60px;
 }
 
 .separator:first-child {
@@ -94,4 +94,13 @@ tr td:nth-child(4) {
 td img {
   max-width: 48px;
   max-height: 48px;
+}
+
+.mid td {
+  font-size: 14px;
+}
+
+.mid td img {
+  max-width: 36px;
+  max-height: 36px;
 }
