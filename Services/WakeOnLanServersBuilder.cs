@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using Microsoft.Extensions.Options;
 
 public class WakeOnLanServersBuilder
@@ -117,6 +118,10 @@ public class WakeOnLanServersBuilder
             }
         }
         catch (TaskCanceledException)
+        {
+            server.IsApiUp = false;
+        }
+        catch (SocketException)
         {
             server.IsApiUp = false;
         }
